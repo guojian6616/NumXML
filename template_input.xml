@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<mocp>
+	<configuration>
+		<materials file="cube_m.xml" energy_group="2" />
+		<tracer quadrature="carlson" order="4" spacing="0.5" />
+		<solver type="eigenvalue" criterion= "scalar_flux" max_iter="1500" keff="1.0" tol="1.e-5" />
+		<parallelism threads="1" />
+	</configuration>
+	<surfaces>
+		<surface name="top"    id="101" bc="none" type="zplane" paras="124.7" />
+		<surface name="bottom" id="102" bc="none" type="zplane" paras="-124.7" />
+		<surface name="left"   id="103" bc="none" type="yplane" paras="-124.7" />
+		<surface name="right"  id="104" bc="none" type="yplane" paras="124.7" />
+		<surface name="front"  id="105" bc="none" type="xplane" paras="124.7" />
+		<surface name="back"   id="106" bc="none" type="xplane" paras="-124.7" />
+	</surfaces>
+	<cells>
+		<root id="1001" type="material" filler="1001" mesh="32 32 32" paras="-101 102 103 -104 -105 106" />
+	</cells>
+</mocp>
