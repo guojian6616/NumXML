@@ -23,7 +23,22 @@ void xmlDocument::loadXMLDocument(const char* xmldoc)
 
 	printf("xml file:\n%s\n", _buffer);
 
-	// char* buffer = new char [length+1];
+	char* buffer = new char [length+1];
+
+	char* start = buffer;
+
+	while(_buffer != NULL && *_buffer != '\0')
+	{
+		if(*_buffer != '\n' && *_buffer != '\t')
+		{
+			*start = *_buffer;
+			start++;
+		}
+		printf("%c",*_buffer);
+		_buffer++;
+	}
+	*start = '\0';
+
 
 	// int counter = 0;
 	// for (int i=0; i<(int)length; i++)
@@ -32,9 +47,9 @@ void xmlDocument::loadXMLDocument(const char* xmldoc)
 	// 		buffer[counter++] = _buffer[i];
 	// }
 
-	// printf("new buffer:\n%s\n", buffer);
+	printf("new buffer size %lu:\n%s\n", strlen(buffer), buffer);
 
-	// delete [] buffer;
+	delete [] buffer;
 
 	fclose(fin);
 }
