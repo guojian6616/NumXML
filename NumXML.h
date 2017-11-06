@@ -36,6 +36,8 @@ public:
 	// xmlNode();
 	// virtual ~xmlNode();
 
+	// virtual void parse(char* p);
+
 	void clone(bool flag);
 };
 
@@ -63,6 +65,8 @@ public:
 	xmlNode** getElementsByTagName(const char* name);
 
 	void insertBefore(xmlNode* new_node, xmlNode* node);
+
+	void parse(char* p);
 };
 
 
@@ -92,6 +96,11 @@ public:
 	xmlText* createTextNode(const char* text);
 	xmlComment* createComment(const char* comment);
 
+	char* skipDeclaration(char* buffer);
+
+	char* skipComment(char* buffer);
+
+	// void parse(char* p);
 };
 
 
