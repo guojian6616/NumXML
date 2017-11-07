@@ -42,6 +42,8 @@ public:
 	void clone(bool flag);
 
 	virtual char* parse(char* buffer, bool status=true);
+
+	char* identifyNodeType(char* buffer, xmlNode** node);
 };
 
 

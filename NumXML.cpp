@@ -24,14 +24,32 @@ xmlNode::~xmlNode()
 
 char* xmlNode::parse(char* buffer, bool status)
 {
+	while (buffer != NULL && *buffer != '\0')
+	{
+		xmlNode* node = NULL;
 
+		buffer = identifyNodeType(buffer, &node);
+
+		if (node == NULL)
+			break;
+
+		bool status = true;
+		buffer = node->parse(buffer, status);
+
+	}
+}
+
+
+char* xmlNode::identifyNodeType(char* buffer, xmlNode** node)
+{
+	
 }
 
 
 /* ------------------------------- xmlElement ------------------------------- */
 xmlElement::xmlElement()
 {
-
+	_type = XML_ELEMENT_NODE;
 }
 
 
@@ -49,7 +67,7 @@ char* xmlElement::parse(char* buffer, bool status)
 /* --------------------------------- xmlNode -------------------------------- */
 xmlText::xmlText()
 {
-
+	_type = XML_TEXT_NODE;
 }
 
 
@@ -67,7 +85,7 @@ char* xmlText::parse(char* buffer, bool status)
 /* ------------------------------- xmlAttribute ----------------------------- */
 xmlAttribute::xmlAttribute()
 {
-
+	_type = XML_ATTRIBUTE_NODE;
 }
 
 
@@ -84,7 +102,7 @@ char* xmlAttribute::parse(char* buffer, bool status)
 /* -------------------------------- xmlComment ------------------------------ */
 xmlComment::xmlComment()
 {
-
+	_type = XML_COMMENT_NODE;
 }
 
 
