@@ -11,6 +11,7 @@ enum xml_node_type
 	XML_TEXT_NODE = 3,
 	XML_COMMENT_NODE = 8,
 	XML_DOCUMENT_NODE = 9,
+	XML_UNSET_NODE = 255
 };
 
 
@@ -33,12 +34,14 @@ protected:
 	xml_node_type _type;
 
 public:
-	// xmlNode();
-	// virtual ~xmlNode();
+	xmlNode();
+	virtual ~xmlNode();
 
 	// virtual void parse(char* p);
 
 	void clone(bool flag);
+
+	virtual char* parse(char* buffer, bool status=true);
 };
 
 
@@ -50,8 +53,8 @@ private:
 	xmlAttribute* _first_attribute;
 	xmlAttribute* _last_attribute;
 public:
-	// xmlElement();
-	// virtual ~xmlElement();
+	xmlElement();
+	virtual ~xmlElement();
 
 	void appendChild(xmlNode* child);
 	void removeChild(xmlNode* child);
@@ -62,11 +65,11 @@ public:
 	xmlAttribute* getAttributeNode(const char* attr);
 	void removeAttributeNode(xmlAttribute* attr);
 
-	xmlNode** getElementsByTagName(const char* name);
+	// xmlNode** getElementsByTagName(const char* name);
 
 	void insertBefore(xmlNode* new_node, xmlNode* node);
 
-	void parse(char* p);
+	char* parse(char* buffer, bool status=true);
 };
 
 
@@ -75,19 +78,41 @@ class xmlText : public xmlNode
 private:
 
 public:
-	// xmlText();
-	// virtual ~xmlText();
+	xmlText();
+	virtual ~xmlText();
+	char* parse(char* buffer, bool status=true);
 };
 
 
-class xmlDocument : public xmlElement
+class xmlAttribute : public xmlNode
+{
+private:
+
+public:
+	xmlAttribute();
+	virtual ~xmlAttribute();
+	char* parse(char* buffer, bool status=true);
+};
+
+class xmlComment : public xmlNode
+{
+private:
+
+public:
+	xmlComment();
+	virtual ~xmlComment();
+	char* parse(char* buffer, bool status=true);
+};
+
+
+class xmlDocument : public xmlNode
 {
 private:
 	char* _buffer;
 
 public:
-	// xmlDocument();
-	// virtual ~xmlDocument();
+	xmlDocument();
+	virtual ~xmlDocument();
 
 	void loadXMLDocument(const char* xmldocument);
 	void loadXMLString(const char* xmlstring);
@@ -97,29 +122,9 @@ public:
 	xmlComment* createComment(const char* comment);
 
 	char* skipDeclaration(char* buffer);
-
 	char* skipComment(char* buffer);
+	char* skipSpace(char* buffer);
 
-	// void parse(char* p);
-};
-
-
-class xmlAttribute : public xmlNode
-{
-private:
-
-public:
-	// xmlAttribute();
-	// virtual ~xmlAttribute();
-};
-
-class xmlComment : public xmlNode
-{
-private:
-
-public:
-	// xmlComment();
-	// virtual ~xmlComment();
 };
 
 #endif

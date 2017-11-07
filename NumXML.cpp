@@ -1,12 +1,119 @@
 #include "NumXML.h"
 
-// xmlDocument::xmlDocument()
-// {
+/* --------------------------------- xmlNode -------------------------------- */
+xmlNode::xmlNode():
+_name(NULL),
+_value(NULL),
+_parent(NULL),
+_next_sibling(NULL),
+_prev_sibling(NULL),
+_type(XML_UNSET_NODE)
+{
 
-// }
+}
+
+
+xmlNode::~xmlNode()
+{
+	if(_name != NULL)
+		delete [] _name;
+	if(_value != NULL)
+		delete [] _value;
+}
+
+
+char* xmlNode::parse(char* buffer, bool status)
+{
+
+}
+
+
+/* ------------------------------- xmlElement ------------------------------- */
+xmlElement::xmlElement()
+{
+
+}
+
+
+xmlElement::~xmlElement()
+{
+
+}
+
+
+char* xmlElement::parse(char* buffer, bool status)
+{
+	
+}
+
+/* --------------------------------- xmlNode -------------------------------- */
+xmlText::xmlText()
+{
+
+}
+
+
+xmlText::~xmlText()
+{
+
+}
+
+
+char* xmlText::parse(char* buffer, bool status)
+{
+	
+}
+
+/* ------------------------------- xmlAttribute ----------------------------- */
+xmlAttribute::xmlAttribute()
+{
+
+}
+
+
+xmlAttribute::~xmlAttribute()
+{
+
+}
+
+
+char* xmlAttribute::parse(char* buffer, bool status)
+{
+	
+}
+/* -------------------------------- xmlComment ------------------------------ */
+xmlComment::xmlComment()
+{
+
+}
+
+
+xmlComment::~xmlComment()
+{
+
+}
+
+
+char* xmlComment::parse(char* buffer, bool status)
+{
+	
+}
+
+/* ------------------------------- xmlDocument ------------------------------ */
+xmlDocument::xmlDocument(): xmlNode()
+{
+	_type = XML_DOCUMENT_NODE;
+}
+
+xmlDocument::~xmlDocument()
+{
+	if(_buffer != NULL)
+		delete [] _buffer;
+}
 
 void xmlDocument::loadXMLDocument(const char* xmldoc)
 {
+	// 读取文件
 	FILE* fin = fopen(xmldoc, "r");
 	if(fin == NULL)
 		printf("error: open file %s failed.\n", xmldoc);
@@ -20,7 +127,7 @@ void xmlDocument::loadXMLDocument(const char* xmldoc)
 
 	fclose(fin);
 
-	// 删除换行符
+	// 删除换行符和TAB
 	printf("length: %ld buffer size %lu ", length, strlen(_buffer));
 
 	printf("xml file:\n%s\n", _buffer);
@@ -28,6 +135,7 @@ void xmlDocument::loadXMLDocument(const char* xmldoc)
 	char* buffer = new char [length+1];
 
 	char* start = buffer;
+	char* old_buffer = _buffer;
 
 	while(_buffer != NULL && *_buffer != '\0')
 	{
@@ -36,24 +144,19 @@ void xmlDocument::loadXMLDocument(const char* xmldoc)
 			*start = *_buffer;
 			start++;
 		}
-		// printf("%c",*_buffer);
 		_buffer++;
 	}
 	*start = '\0';
 
-	// printf("new buffer size %lu:\n%s\n\n", strlen(buffer), buffer);
+	/** 有两个指针
+	 *  _buffer 预留，用来释放内存，不要修改
+	 *   buffer 解析时使用 */
+	delete [] old_buffer;
+	_buffer = NULL;
+	_buffer = buffer;
+	printf("--------------------------------------\n%s\n", _buffer);
 
-	start = skipDeclaration(buffer);
-	// printf("skip declaration:\n%s\n", start);
-
-	start = skipComment(start);
-	printf("skip comment:\n%s\n", start);
-
-	// parse(start);
-	while(start != NULL && *start != '\0')
-	{
-		
-	}
+	// 解析xml
 }
 
 
@@ -89,6 +192,16 @@ char* xmlDocument::skipComment(char* buffer)
 		buffer = buffer + 3;
 	}
 
+	return buffer;
+}
+
+
+char* xmlDocument::skipSpace(char* buffer)
+{
+	while(*buffer == ' ')
+	{
+		buffer++;
+	}
 	return buffer;
 }
 
