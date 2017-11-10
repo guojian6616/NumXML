@@ -11,7 +11,11 @@ enum xml_node_type
 	XML_TEXT_NODE = 3,
 	XML_COMMENT_NODE = 8,
 	XML_DOCUMENT_NODE = 9,
-	XML_UNSET_NODE = 255
+	XML_DECLARATION_NODE = 254,
+	XML_UNSET_NODE = 255,
+
+	/** </xxx> */
+	XML_ELEMENT_NODE_END = 0
 };
 
 
@@ -28,6 +32,9 @@ protected:
 	char* _value;
 	xmlNode* _parent;
 
+	xmlNode* _first_child;
+	xmlNode* _last_child;
+
 	xmlNode* _next_sibling;
 	xmlNode* _prev_sibling;
 
@@ -41,25 +48,40 @@ public:
 
 	void clone(bool flag);
 
+	void setType(xml_node_type type);
+	xml_node_type getType();
+
 	virtual char* parse(char* buffer, bool status=true);
 
 	char* identifyNodeType(char* buffer, xmlNode** node);
+
+	/** Check if the node is document */
+	bool isDocument();
+
+	/** Check the end tag <tag> ... </tag> */
+	char* checkEndTag(char* buffer, bool* status);
+
+	void appendChild(xmlNode* child);
+	void removeChild(xmlNode* child);
+
+	void setPrev(xmlNode* prev);
+	void setNext(xmlNode* next);
+	void setParent(xmlNode* parent);
+
+	char* skipDeclaration(char* buffer);
+	char* skipComment(char* buffer);
+	char* skipSpace(char* buffer);
 };
 
 
 class xmlElement : public xmlNode
 {
 private:
-	xmlNode* _first_child;
-	xmlNode* _last_child;
 	xmlAttribute* _first_attribute;
 	xmlAttribute* _last_attribute;
 public:
 	xmlElement();
 	virtual ~xmlElement();
-
-	void appendChild(xmlNode* child);
-	void removeChild(xmlNode* child);
 
 	void setAttribute(const char* attr, const char* value);
 	void setAttributeNode(xmlAttribute* attr);
@@ -107,7 +129,18 @@ public:
 };
 
 
-class xmlDocument : public xmlNode
+class xmlDeclaration : public xmlNode
+{
+private:
+
+public:
+	xmlDeclaration();
+	~xmlDeclaration();
+	char* parse(char* buffer, bool status=true);
+};
+
+
+class xmlDocument : public xmlElement
 {
 private:
 	char* _buffer;
@@ -122,11 +155,6 @@ public:
 	xmlElement* createElement(const char* name);
 	xmlText* createTextNode(const char* text);
 	xmlComment* createComment(const char* comment);
-
-	char* skipDeclaration(char* buffer);
-	char* skipComment(char* buffer);
-	char* skipSpace(char* buffer);
-
 };
 
 #endif
