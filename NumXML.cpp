@@ -21,6 +21,38 @@ xmlNode::~xmlNode()
 		delete [] _name;
 	if(_value != NULL)
 		delete [] _value;
+
+	// xmlNode* node = _first_child;
+	// while (node != NULL)
+	// {
+	// 	xmlNode* temp = node;
+	// 	xml_node_type type = temp->getType();
+	// 	node = node->getNext();
+	// 	if (type == XML_ELEMENT_NODE)
+	// 	{
+	// 		xmlElement* element = static_cast<xmlElement*>(temp);
+
+	// 		delete element;
+	// 	}
+
+	// 	else if (type == XML_TEXT_NODE)
+	// 	{
+	// 		xmlText* text = static_cast<xmlText*>(temp);
+	// 		// delete text;
+	// 	}
+
+	// 	else if (type == XML_COMMENT_NODE)
+	// 	{
+	// 		xmlComment* comment = static_cast<xmlComment*>(temp);
+	// 		// delete comment;
+	// 	}
+
+	// 	else if (type == XML_DECLARATION_NODE)
+	// 	{
+	// 		xmlDeclaration* declaration = static_cast<xmlDeclaration*>(temp);
+	// 		// delete declaration;
+	// 	}
+	// }
 }
 
 
@@ -153,12 +185,14 @@ void xmlNode::appendChild(xmlNode* child)
 		{
 			_first_child = child;
 			_last_child = child;
+			child->setParent(this);
 		}
 
-		if (_last_child != NULL)
+		else if (_last_child != NULL)
 		{
 			_last_child->setNext(child);
 			child->setPrev(_last_child);
+			_last_child = child;
 			child->setParent(this);
 		}
 	}
@@ -173,6 +207,16 @@ void xmlNode::setPrev(xmlNode* prev)
 void xmlNode::setNext(xmlNode* next)
 {
 	_next_sibling = next;
+}
+
+xmlNode* xmlNode::getPrev()
+{
+	return _prev_sibling;
+}
+
+xmlNode* xmlNode::getNext()
+{
+	return _next_sibling;
 }
 
 void xmlNode::setParent(xmlNode* parent)
@@ -223,6 +267,21 @@ char* xmlNode::skipComment(char* buffer)
 
 	return buffer;
 }
+
+char* xmlNode::getName()
+{
+	return _name;
+}
+
+char* xmlNode::getValue()
+{
+	return _value;
+}
+
+void xmlNode::print()
+{
+
+}
 /* ------------------------------- xmlElement ------------------------------- */
 xmlElement::xmlElement(): xmlNode(),
 // _first_child(NULL),
@@ -236,7 +295,14 @@ _last_attribute(NULL)
 
 xmlElement::~xmlElement()
 {
-
+	// 释放所有的属性内存
+	xmlAttribute* attr = _first_attribute;
+	while (attr != NULL)
+	{
+		xmlAttribute* temp = static_cast<xmlAttribute*>(attr);
+		attr = static_cast<xmlAttribute*>(attr->getNext());
+		delete temp;
+	}
 }
 
 
@@ -264,7 +330,7 @@ char* xmlElement::parse(char* buffer, bool* status)
 
 	buffer = skipSpace(buffer);
 
-	// 获取属性
+	// 获取所有属性
 	while (*buffer != '/' && *buffer != '>')
 	{
 		xmlAttribute* attr = new xmlAttribute();
@@ -287,15 +353,6 @@ char* xmlElement::parse(char* buffer, bool* status)
 		buffer = this->xmlNode::parse(buffer, &status);
 	}
 
-	// if (strncmp(buffer, "/>", 2) == 0)
-	// 	return buffer;
-
-	// else if (*buffer == '>')
-	// {
-	// 	buffer++;
-	// }
-
-	// 获取
 	return buffer;
 }
 
@@ -304,23 +361,47 @@ void xmlElement::setAttributeNode(xmlAttribute* attr)
 {
 	if (attr != NULL)
 	{
+		if (attr->getName() == NULL)
+		{
+			delete attr;
+			return;
+		}
 		if (_first_attribute == NULL && _last_attribute == NULL)
 		{
 			_first_attribute = attr;
-			_last_child = attr;
+			_last_attribute = attr;
+			attr->setParent(this);
 		}
-
-		if (_last_attribute != NULL)
+		else if (_last_attribute != NULL)
 		{
 			_last_attribute->setNext(attr);
 			attr->setPrev(_last_attribute);
+			_last_attribute = attr;
 			attr->setParent(this);
 		}
 	}
 }
 
+void xmlElement::print()
+{
+	printf("element name: %s\n", _name);
+	xmlAttribute* attr = _first_attribute;
+	while(attr != NULL)
+	{
+		attr->print();
+		attr = static_cast<xmlAttribute*>(attr->getNext());
+	}
+
+	xmlNode* node = _first_child;
+	while(node != NULL)
+	{
+		node->print();
+		node = node->getNext();
+	}
+}
+
 /* --------------------------------- xmlText -------------------------------- */
-xmlText::xmlText()
+xmlText::xmlText() : xmlNode()
 {
 	_type = XML_TEXT_NODE;
 }
@@ -356,8 +437,12 @@ char* xmlText::parse(char* buffer, bool* status)
 	return buffer;
 }
 
+void xmlText::print()
+{
+	printf("%s\n", _value);
+}
 /* ------------------------------- xmlAttribute ----------------------------- */
-xmlAttribute::xmlAttribute()
+xmlAttribute::xmlAttribute() : xmlNode()
 {
 	_type = XML_ATTRIBUTE_NODE;
 }
@@ -408,15 +493,20 @@ char* xmlAttribute::parse(char* buffer, bool* status)
 	}
 	return buffer;
 }
+
+void xmlAttribute::print()
+{
+	printf("%s=\"%s\"\n", _name, _value);
+}
 /* -------------------------------- xmlComment ------------------------------ */
-xmlComment::xmlComment()
+xmlComment::xmlComment() : xmlNode()
 {
 	_type = XML_COMMENT_NODE;
 }
 
 
 xmlComment::~xmlComment()
-{
+{ 
 
 }
 
@@ -445,9 +535,12 @@ char* xmlComment::parse(char* buffer, bool* status)
 	return buffer;
 }
 
-
+void xmlComment::print()
+{
+	printf("comment: %s\n", _value);
+}
 /* ------------------------------ xmlDeclaration ---------------------------- */
-xmlDeclaration::xmlDeclaration()
+xmlDeclaration::xmlDeclaration() : xmlNode()
 {
 	_type = XML_DECLARATION_NODE;
 }
@@ -481,7 +574,10 @@ char* xmlDeclaration::parse(char* buffer, bool* status)
 	return buffer;
 }
 
-
+void xmlDeclaration::print()
+{
+	printf("declaration: %s\n", _value);
+}
 /* ------------------------------- xmlDocument ------------------------------ */
 xmlDocument::xmlDocument(): xmlElement(),
 _buffer(NULL)
@@ -543,23 +639,7 @@ void xmlDocument::loadXMLDocument(const char* xmldoc)
 	// 解析xml
 	bool status = true;
 	xmlNode::parse(buffer, &status);
+
+	printf("=================================");
+	print();
 }
-
-
-
-
-
-// xmlElement::xmlElement()
-// {
-// 	_type = XML_ELEMENT_NODE;
-// 	_first_child = NULL;
-// 	_last_child = NULL;
-// 	_first_attribute = NULL;
-// 	_last_attribute = NULL;
-// }
-
-
-// xmlNode::xmlNode()
-// {
-
-// }

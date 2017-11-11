@@ -66,11 +66,18 @@ public:
 
 	void setPrev(xmlNode* prev);
 	void setNext(xmlNode* next);
+	xmlNode* getPrev();
+	xmlNode* getNext();
 	void setParent(xmlNode* parent);
 
 	char* skipDeclaration(char* buffer);
 	char* skipComment(char* buffer);
 	char* skipSpace(char* buffer);
+
+	char* getName();
+	char* getValue();
+
+	virtual void print();
 };
 
 
@@ -94,6 +101,8 @@ public:
 	void insertBefore(xmlNode* new_node, xmlNode* node);
 
 	char* parse(char* buffer, bool* status=NULL);
+
+	void print();
 };
 
 
@@ -105,6 +114,7 @@ public:
 	xmlText();
 	virtual ~xmlText();
 	char* parse(char* buffer, bool* status=NULL);
+	void print();
 };
 
 
@@ -116,6 +126,7 @@ public:
 	xmlAttribute();
 	virtual ~xmlAttribute();
 	char* parse(char* buffer, bool* status=NULL);
+	void print();
 };
 
 class xmlComment : public xmlNode
@@ -126,6 +137,7 @@ public:
 	xmlComment();
 	virtual ~xmlComment();
 	char* parse(char* buffer, bool* status=NULL);
+	void print();
 };
 
 
@@ -137,6 +149,7 @@ public:
 	xmlDeclaration();
 	~xmlDeclaration();
 	char* parse(char* buffer, bool* status=NULL);
+	void print();
 };
 
 
@@ -155,6 +168,7 @@ public:
 	xmlElement* createElement(const char* name);
 	xmlText* createTextNode(const char* text);
 	xmlComment* createComment(const char* comment);
+	// void print();
 };
 
 #endif
