@@ -51,7 +51,7 @@ public:
 	void setType(xml_node_type type);
 	xml_node_type getType();
 
-	virtual char* parse(char* buffer, bool status=true);
+	virtual char* parse(char* buffer, bool* status=NULL);
 
 	char* identifyNodeType(char* buffer, xmlNode** node);
 
@@ -93,7 +93,7 @@ public:
 
 	void insertBefore(xmlNode* new_node, xmlNode* node);
 
-	char* parse(char* buffer, bool status=true);
+	char* parse(char* buffer, bool* status=NULL);
 };
 
 
@@ -104,7 +104,7 @@ private:
 public:
 	xmlText();
 	virtual ~xmlText();
-	char* parse(char* buffer, bool status=true);
+	char* parse(char* buffer, bool* status=NULL);
 };
 
 
@@ -115,7 +115,7 @@ private:
 public:
 	xmlAttribute();
 	virtual ~xmlAttribute();
-	char* parse(char* buffer, bool status=true);
+	char* parse(char* buffer, bool* status=NULL);
 };
 
 class xmlComment : public xmlNode
@@ -125,7 +125,7 @@ private:
 public:
 	xmlComment();
 	virtual ~xmlComment();
-	char* parse(char* buffer, bool status=true);
+	char* parse(char* buffer, bool* status=NULL);
 };
 
 
@@ -136,7 +136,7 @@ private:
 public:
 	xmlDeclaration();
 	~xmlDeclaration();
-	char* parse(char* buffer, bool status=true);
+	char* parse(char* buffer, bool* status=NULL);
 };
 
 

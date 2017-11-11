@@ -36,8 +36,10 @@ xml_node_type xmlNode::getType()
 }
 
 
-char* xmlNode::parse(char* buffer, bool status)
+char* xmlNode::parse(char* buffer, bool* status)
 {
+	bool stat = true;
+	status = &stat;
 	while (buffer != NULL && *buffer != '\0')
 	{
 		xmlNode* node = NULL;
@@ -48,8 +50,8 @@ char* xmlNode::parse(char* buffer, bool status)
 
 		if (node->getType() == XML_ELEMENT_NODE_END)
 		{
-			buffer = checkEndTag(buffer, &status);
-			if (status)
+			buffer = checkEndTag(buffer, status);
+			if (*status)
 			{
 				printf("error, Node %s tags mismatch\n", _name);
 			}
@@ -83,26 +85,26 @@ char* xmlNode::identifyNodeType(char* buffer, xmlNode** node)
 	buffer = skipSpace(buffer);
 
 	xmlNode* child = NULL;
-	if (strncmp(buffer, xml_header, 2) == 0)
-	{
-		child = new xmlDeclaration();
-		buffer = buffer + 2;
-	}
-	else if (strncmp(buffer, xml_comm_header, 4) == 0)
+	if (strncmp(buffer, xml_comm_header, 4) == 0)
 	{
 		child = new xmlComment();
 		buffer = buffer + 4;
 	}
-	else if (strncmp(buffer, xml_element_header, 1) == 0)
+	else if (strncmp(buffer, xml_header, 2) == 0)
 	{
-		child = new xmlElement();
-		buffer = buffer + 1;
+		child = new xmlDeclaration();
+		buffer = buffer + 2;
 	}
 	else if (strncmp(buffer, xml_element_end, 2) ==0)
 	{
 		child = new xmlNode();
 		child->setType(XML_ELEMENT_NODE_END);
 		buffer = buffer + 2;
+	}
+	else if (strncmp(buffer, xml_element_header, 1) == 0)
+	{
+		child = new xmlElement();
+		buffer = buffer + 1;
 	}
 	else
 	{
@@ -224,13 +226,65 @@ xmlElement::~xmlElement()
 }
 
 
-char* xmlElement::parse(char* buffer, bool status)
+char* xmlElement::parse(char* buffer, bool* status)
 {
-	
+	buffer = skipSpace(buffer);
+
+	// 获取元素名称
+	char* start = buffer;
+	while(*buffer != ' ')
+	{
+		buffer++;
+	}
+	int length = buffer - start;
+
+	if (_name != NULL)
+		delete [] _name;
+
+	_name = new char [length+1];
+	strncpy(_name, start, length);
+
+	// 获取属性
+	while (*buffer != '/' && *buffer != '>')
+	{
+		xmlAttribute* attr = new xmlAttribute();
+
+		buffer = attr->parse(buffer);
+
+		setAttributeNode(attr);
+	}
+
+	if (strncmp(buffer, "/>", 2) != 0 && strncmp(buffer, ">", 1) == 0)
+	{
+		bool status = true;
+		buffer = this->xmlNode::parse(buffer, &status);
+	}
+
+	// 获取
 	return buffer;
 }
 
-/* --------------------------------- xmlNode -------------------------------- */
+
+void xmlElement::setAttributeNode(xmlAttribute* attr)
+{
+	if (attr != NULL)
+	{
+		if (_first_attribute == NULL && _last_attribute == NULL)
+		{
+			_first_attribute = attr;
+			_last_child = attr;
+		}
+
+		if (_last_attribute != NULL)
+		{
+			_last_attribute->setNext(attr);
+			attr->setPrev(_last_attribute);
+			attr->setParent(this);
+		}
+	}
+}
+
+/* --------------------------------- xmlText -------------------------------- */
 xmlText::xmlText()
 {
 	_type = XML_TEXT_NODE;
@@ -243,7 +297,7 @@ xmlText::~xmlText()
 }
 
 
-char* xmlText::parse(char* buffer, bool status)
+char* xmlText::parse(char* buffer, bool* status)
 {
 	buffer = skipSpace(buffer);
 	char* start = buffer;
@@ -275,8 +329,47 @@ xmlAttribute::~xmlAttribute()
 }
 
 
-char* xmlAttribute::parse(char* buffer, bool status)
+char* xmlAttribute::parse(char* buffer, bool* status)
 {
+	buffer = skipSpace(buffer);
+
+	*status = false;
+
+	char* start = buffer;
+	while(strncmp(buffer, "/>", 2) != 0 || strncmp(buffer, ">", 1) != 0)
+	{
+		buffer++;
+		if (*buffer == '=' && buffer > start)
+		{
+			int length = buffer - start;
+			_name = new char [length+1];
+			strncpy(_name, buffer, length);
+		}
+
+		if (*buffer == '\"' && *status == false)
+		{
+			start = buffer;
+			*status = true;
+		}
+
+		if (*buffer == '\"' && *status == true)
+		{
+			if (buffer > start)
+			{
+				if (buffer == (start + 1))
+				{
+					if (_value != NULL) delete [] _value;
+					else
+					{
+						int length = buffer - start;
+						_value = new char [length];
+
+						strncpy(_value, (start+1), length-1);
+					}
+				}
+			}
+		}
+	}
 	return buffer;
 }
 /* -------------------------------- xmlComment ------------------------------ */
@@ -292,7 +385,7 @@ xmlComment::~xmlComment()
 }
 
 
-char* xmlComment::parse(char* buffer, bool status)
+char* xmlComment::parse(char* buffer, bool* status)
 {
 	buffer = skipSpace(buffer);
 	char* start = buffer;
@@ -325,7 +418,7 @@ xmlDeclaration::~xmlDeclaration()
 
 }
 
-char* xmlDeclaration::parse(char* buffer, bool status)
+char* xmlDeclaration::parse(char* buffer, bool* status)
 {
 	buffer = skipSpace(buffer);
 	char* start = buffer;
@@ -405,7 +498,8 @@ void xmlDocument::loadXMLDocument(const char* xmldoc)
 	printf("--------------------------------------\n%s\n", _buffer);
 
 	// 解析xml
-	// parse(buffer);
+	bool status = true;
+	parse(buffer, &status);
 }
 
 
