@@ -97,6 +97,7 @@ public:
 	void removeAttributeNode(xmlAttribute* attr);
 
 	// xmlNode** getElementsByTagName(const char* name);
+	int getNumberElement(char* name);
 
 	void insertBefore(xmlNode* new_node, xmlNode* node);
 

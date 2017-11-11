@@ -382,6 +382,25 @@ void xmlElement::setAttributeNode(xmlAttribute* attr)
 	}
 }
 
+
+int xmlElement::getNumberElement(char* name)
+{
+	int number = 0;
+
+	if (_name != NULL && strcmp(_name, name) == 0)
+		number++;
+
+	xmlNode* node = _first_child;
+	while (node != NULL)
+	{
+		if (node->getType() == XML_ELEMENT_NODE)
+			number = number + static_cast<xmlElement*>(node)->getNumberElement(name);
+		node = node->getNext();
+	}
+
+	return number;
+}
+
 void xmlElement::print()
 {
 	printf("element name: %s\n", _name);

@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<material model="kuca" id="101">
+	<core id = "104">KUCA</core>
+	<core id ="105" ID="107">FBR</core>
+</material>
