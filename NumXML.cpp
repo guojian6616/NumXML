@@ -22,37 +22,38 @@ xmlNode::~xmlNode()
 	if(_value != NULL)
 		delete [] _value;
 
-	// xmlNode* node = _first_child;
-	// while (node != NULL)
-	// {
-	// 	xmlNode* temp = node;
-	// 	xml_node_type type = temp->getType();
-	// 	node = node->getNext();
-	// 	if (type == XML_ELEMENT_NODE)
-	// 	{
-	// 		xmlElement* element = static_cast<xmlElement*>(temp);
+	xmlNode* node = _first_child;
+	while (node != NULL)
+	{
+		xmlNode* temp = node;
+		xml_node_type type = temp->getType();
+		node = node->getNext();
+		// delete node;
+		if (type == XML_ELEMENT_NODE)
+		{
+			xmlElement* element = static_cast<xmlElement*>(temp);
 
-	// 		delete element;
-	// 	}
+			delete element;
+		}
 
-	// 	else if (type == XML_TEXT_NODE)
-	// 	{
-	// 		xmlText* text = static_cast<xmlText*>(temp);
-	// 		// delete text;
-	// 	}
+		else if (type == XML_TEXT_NODE)
+		{
+			xmlText* text = static_cast<xmlText*>(temp);
+			delete text;
+		}
 
-	// 	else if (type == XML_COMMENT_NODE)
-	// 	{
-	// 		xmlComment* comment = static_cast<xmlComment*>(temp);
-	// 		// delete comment;
-	// 	}
+		else if (type == XML_COMMENT_NODE)
+		{
+			xmlComment* comment = static_cast<xmlComment*>(temp);
+			delete comment;
+		}
 
-	// 	else if (type == XML_DECLARATION_NODE)
-	// 	{
-	// 		xmlDeclaration* declaration = static_cast<xmlDeclaration*>(temp);
-	// 		// delete declaration;
-	// 	}
-	// }
+		else if (type == XML_DECLARATION_NODE)
+		{
+			xmlDeclaration* declaration = static_cast<xmlDeclaration*>(temp);
+			delete declaration;
+		}
+	}
 }
 
 
