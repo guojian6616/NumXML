@@ -6,7 +6,7 @@ int main()
 	xmldoc->loadXMLDocument("template.xml");
 
 	int number = xmldoc->getNumberElement("material");
-	printf("number material = %d", number);
+	printf("number material = %d\n", number);
 
 	xmlElement** material = new xmlElement* [number];
 
