@@ -283,6 +283,31 @@ void xmlNode::print()
 {
 
 }
+
+bool xmlNode::isNameAfter(const char* name)
+{
+	if (_name != NULL && strcmp(_name, name) == 0)
+		return true;
+	return false;
+}
+
+int xmlNode::getNumberFigures(char* str)
+{
+	int number = 0;
+	char* endptr = str;
+	while (*endptr != '\0')
+	{
+		strtod(str, &endptr);
+		str = endptr;
+		number++;
+		while (*endptr == ' ' || *endptr == '\t')
+			endptr++;
+	}
+
+	return number;
+}
+
+
 /* ------------------------------- xmlElement ------------------------------- */
 xmlElement::xmlElement(): xmlNode(),
 // _first_child(NULL),
@@ -313,7 +338,7 @@ char* xmlElement::parse(char* buffer, bool* status)
 
 	// 获取元素名称
 	char* start = buffer;
-	while(*buffer != ' ' && *buffer != '/' && *buffer != '>')
+	while(*buffer != ' ' && *buffer != '/' && *buffer != '>' && *buffer != '\t')
 	{
 		buffer++;
 	}
@@ -383,12 +408,52 @@ void xmlElement::setAttributeNode(xmlAttribute* attr)
 	}
 }
 
+xmlAttribute* xmlElement::getAttributeNode(const char* name)
+{
+	xmlAttribute* attr = _first_attribute;
 
-int xmlElement::getNumberElement(char* name)
+	while (attr != NULL)
+	{
+		if (attr->isNameAfter(name))
+			return attr;
+		attr = static_cast<xmlAttribute*>(attr->getNext());
+	}
+
+	return NULL;
+}
+
+xmlElement** xmlElement::getElementsNamedAfter(const char* name, xmlElement** eles)
+{
+	if (!eles)
+	{
+		printf("error, elements pointer is null.\n");
+		return NULL;
+	}
+	if (isNameAfter(name))
+	{
+		*eles = this;
+		eles = eles + 1;
+	}
+
+	xmlNode* node = _first_child;
+	
+	while (node != NULL)
+	{
+		if (node->getType() == XML_ELEMENT_NODE)
+		{
+			eles = static_cast<xmlElement*>(node)->getElementsNamedAfter(name, eles);
+		}
+		node = node->getNext();
+	}
+
+	return eles;
+}
+
+int xmlElement::getNumberElement(const char* name)
 {
 	int number = 0;
 
-	if (_name != NULL && strcmp(_name, name) == 0)
+	if (isNameAfter(name))
 		number++;
 
 	xmlNode* node = _first_child;
@@ -400,6 +465,266 @@ int xmlElement::getNumberElement(char* name)
 	}
 
 	return number;
+}
+
+char* xmlElement::getElementValue()
+{
+	if (_first_child->getType() == XML_TEXT_NODE)
+		return _first_child->getValue();
+	else
+	{
+		printf("Element: %s has no value.\n", _name);
+		return NULL;
+	}
+}
+
+char* xmlElement::getElementValue(const char* name)
+{
+	if (name == NULL)
+	{
+		printf("ELement: %s, child element name is null\n", _name);
+		return NULL;
+	}
+
+	xmlNode* node = _first_child;
+	while (node != NULL)
+	{
+		if (node->getType() == XML_ELEMENT_NODE && static_cast<xmlElement*>(node)->isNameAfter(name))
+		{
+			return static_cast<xmlElement*>(node)->getElementValue();
+			node = node->getNext();
+		}
+	}
+
+	printf("Element: %s has no child element named after %s\n", _name, name);
+	return NULL;
+}
+
+char* xmlElement::getAttributeValue(const char* name)
+{
+	if (name == NULL)
+	{
+		printf("ELement: %s, attribute name is null\n", _name);
+		return NULL;
+	}
+
+	xmlAttribute* attr = _first_attribute;
+	while (attr != NULL)
+	{
+		if (attr->isNameAfter(name))
+			return attr->getValue();
+		attr = static_cast<xmlAttribute*>(attr->getNext());
+	}
+
+	printf("Element: %s has no attribute named after %s\n", _name, name);
+	return NULL;
+}
+
+int xmlElement::getElementValueInteger()
+{
+	char* value = getElementValue();
+	if (value == NULL)
+	{
+		printf("Element: %s has no value\n", _name);
+		return 0;
+	}
+
+	int number =0;
+	number = atoi(value);
+	return number;	
+}
+
+int* xmlElement::getElementValueIntegers(int* number)
+{
+	char* value = getElementValue();
+	if (value == NULL)
+	{
+		printf("Element: %s has no value\n", _name);
+		*number = 0;
+		return NULL;
+	}
+
+	*number = getNumberFigures(value);
+	int * figures = new int [*number];
+	char* endptr = value;
+	for (int i=0; i<*number; i++)
+	{
+		figures[i] = (int)strtod(value, &endptr);
+		value = endptr;
+	}
+	return figures;
+}
+
+double xmlElement::getElementValueDouble()
+{
+	char* value = getElementValue();
+	if (value == NULL)
+	{
+		printf("Element: %s has no value\n", _name);
+		return 0.;
+	}
+	double figure = 0.;
+
+	figure = strtod(value, NULL);
+	return figure;
+}
+
+double* xmlElement::getElementValueDoubles(int* number)
+{
+	char* value = getElementValue();
+	if (value == NULL)
+	{
+		printf("Element: %s has no value\n", _name);
+		*number = 0;
+		return NULL;
+	}
+	*number = getNumberFigures(value);
+	double * figures = new double [*number];
+	char* endptr = value;
+	for (int i=0; i<*number; i++)
+	{
+		figures[i] = strtod(value, &endptr);
+		value = endptr;
+	}
+	return figures;
+}
+
+int xmlElement::getElementValueInteger(const char* name)
+{
+	char* value = getElementValue(name);
+	if (value == NULL)
+	{
+		// printf("Element: %s has no value\n", _name);
+		return 0;
+	}
+
+	int number =0;
+	number = atoi(value);
+	return number;	
+}
+
+int* xmlElement::getElementValueIntegers(const char* name, int* number)
+{
+	char* value = getElementValue(name);
+	if (value == NULL)
+	{
+		// printf("Element: %s has no value\n", _name);
+		*number = 0;
+		return NULL;
+	}
+
+	*number = getNumberFigures(value);
+	int * figures = new int [*number];
+	char* endptr = value;
+	for (int i=0; i<*number; i++)
+	{
+		figures[i] = (int)strtod(value, &endptr);
+		value = endptr;
+	}
+	return figures;
+}
+
+double xmlElement::getElementValueDouble(const char* name)
+{
+	char* value = getElementValue(name);
+	if (value == NULL)
+	{
+		// printf("Element: %s has no value\n", _name);
+		return 0.;
+	}
+	double figure = 0.;
+
+	figure = strtod(value, NULL);
+	return figure;
+}
+
+double* xmlElement::getElementValueDoubles(const char* name, int* number)
+{
+	char* value = getElementValue(name);
+	if (value == NULL)
+	{
+		// printf("Element: %s has no value\n", _name);
+		*number = 0;
+		return NULL;
+	}
+	*number = getNumberFigures(value);
+	double * figures = new double [*number];
+	char* endptr = value;
+	for (int i=0; i<*number; i++)
+	{
+		figures[i] = strtod(value, &endptr);
+		value = endptr;
+	}
+	return figures;
+}
+
+int xmlElement::getAttributeValueInteger(const char* name)
+{
+	char* value = getAttributeValue(name);
+	if (value == NULL)
+	{
+		printf("Element: %s, Attribute: %s has no value\n", _name, name);
+		return 0;
+	}
+
+	int number =0;
+	number = atoi(value);
+	return number;	
+}
+
+int* xmlElement::getAttributeValueIntegers(const char* name, int* number)
+{
+	char* value = getAttributeValue(name);
+	if (value == NULL)
+	{
+		printf("Element: %s, Attribute: %s has no value\n", _name, name);
+		return NULL;
+	}
+
+	*number = getNumberFigures(value);
+	int * figures = new int [*number];
+	char* endptr = value;
+	for (int i=0; i<*number; i++)
+	{
+		figures[i] = (int)strtod(value, &endptr);
+		value = endptr;
+	}
+	return figures;
+}
+
+double xmlElement::getAttributeValueDouble(const char* name)
+{
+	char* value = getAttributeValue(name);
+	if (value == NULL)
+	{
+		printf("Element: %s, Attribute: %s has no value\n", _name, name);
+		return 0.;
+	}
+
+	double figure = 0.;
+
+	figure = strtod(value, NULL);
+	return figure;
+}
+
+double* xmlElement::getAttributeValueDoubles(const char* name, int* number)
+{
+	char* value = getAttributeValue(name);
+	if (value == NULL)
+	{
+		printf("Element: %s, Attribute: %s has no value\n", _name, name);
+		return NULL;
+	}
+
+	*number = getNumberFigures(value);
+	double * figures = new double [*number];
+	char* endptr = value;
+	for (int i=0; i<*number; i++)
+	{
+		figures[i] = strtod(value, &endptr);
+		value = endptr;
+	}
+	return figures;	
 }
 
 void xmlElement::print()
@@ -489,6 +814,11 @@ char* xmlAttribute::parse(char* buffer, bool* status)
 			_name = new char [length+1];
 			strncpy(_name, start, length);
 			_name[length] = '\0';
+			for (int i=0; i<length; i++)
+			{
+				if (_name[i] == ' ' || _name[i] == '\t')
+					_name[i] = '\0';
+			}
 			printf("attribute name: %s\n", _name);
 		}
 

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <string.h>
+#include <stdlib.h>
 
 enum xml_node_type
 {
@@ -78,6 +79,10 @@ public:
 	char* getValue();
 
 	virtual void print();
+
+	bool isNameAfter(const char* name);
+
+	int getNumberFigures(char* str);
 };
 
 
@@ -93,11 +98,33 @@ public:
 	void setAttribute(const char* attr, const char* value);
 	void setAttributeNode(xmlAttribute* attr);
 	void removeAttribute(const char* attr);
-	xmlAttribute* getAttributeNode(const char* attr);
+	xmlAttribute* getAttributeNode(const char* name);
 	void removeAttributeNode(xmlAttribute* attr);
 
 	// xmlNode** getElementsByTagName(const char* name);
-	int getNumberElement(char* name);
+
+	xmlElement** getElementsNamedAfter(const char* name, xmlElement** eles);
+
+	int getNumberElement(const char* name);
+
+	char* getElementValue();
+	char* getElementValue(const char* name);
+	char* getAttributeValue(const char* name);
+
+	int getElementValueInteger();
+	int* getElementValueIntegers(int* number);
+	double getElementValueDouble();
+	double* getElementValueDoubles(int* number);
+
+	int getElementValueInteger(const char* name);
+	int* getElementValueIntegers(const char* name, int* number);
+	double getElementValueDouble(const char* name);
+	double* getElementValueDoubles(const char* name, int* number);
+
+	int getAttributeValueInteger(const char* name);
+	int* getAttributeValueIntegers(const char* name, int* number);
+	double getAttributeValueDouble(const char* name);
+	double* getAttributeValueDoubles(const char* name, int* number);
 
 	void insertBefore(xmlNode* new_node, xmlNode* node);
 
