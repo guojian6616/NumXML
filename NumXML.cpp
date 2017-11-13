@@ -307,7 +307,11 @@ int xmlNode::getNumberFigures(char* str)
 	return number;
 }
 
-
+void xmlNode::free(void* arr)
+{
+	if (arr != NULL)
+		delete [] arr;
+}
 /* ------------------------------- xmlElement ------------------------------- */
 xmlElement::xmlElement(): xmlNode(),
 // _first_child(NULL),

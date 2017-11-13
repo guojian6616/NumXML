@@ -34,8 +34,14 @@ int main()
 	for (int i=0; i<number; i++)
 		printf("sigma_t[%d] = %f\n", i, sigma_t[i]);
 
-	delete [] sigma_t;
+	xmldoc->free(sigma_t);
+	// delete [] sigma_t;
 
+	int* g = material[0]->getAttributeValueIntegers("energy_group", &number);
+	// printf("g = %f\n", g);
+	printf("number = %d\n", number);
+	for (int i=0; i<number; i++)
+		printf("g[%d] = %d\n", i, g[i]);
 	delete [] material;
 
 	delete xmldoc;

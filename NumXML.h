@@ -83,6 +83,8 @@ public:
 	bool isNameAfter(const char* name);
 
 	int getNumberFigures(char* str);
+
+	void free(void* arr);
 };
 
 
