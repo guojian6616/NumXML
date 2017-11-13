@@ -84,7 +84,9 @@ public:
 
 	int getNumberFigures(char* str);
 
-	void free(void* arr);
+	void free(int* arr);
+	void free(double* arr);
+	void free(float* arr);
 };
 
 

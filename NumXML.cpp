@@ -239,7 +239,7 @@ char* xmlNode::skipDeclaration(char* buffer)
 	// printf("local buffer:\n%s\n\n", buffer);
 	if(strncmp(buffer, "<?", 2) == 0)
 	{
-		printf("start\n");
+		// printf("start\n");
 		buffer = buffer + 2;
 		while(strncmp(buffer, "?>", 2) != 0)
 		{
@@ -257,7 +257,7 @@ char* xmlNode::skipComment(char* buffer)
 	// printf("local buffer:\n%s\n\n", buffer);
 	if(strncmp(buffer, "<!--", 4) == 0)
 	{
-		printf("start\n");
+		// printf("start\n");
 		buffer = buffer + 3;
 		while(strncmp(buffer, "-->", 3) != 0)
 		{
@@ -307,7 +307,19 @@ int xmlNode::getNumberFigures(char* str)
 	return number;
 }
 
-void xmlNode::free(void* arr)
+void xmlNode::free(int* arr)
+{
+	if (arr != NULL)
+		delete [] arr;
+}
+
+void xmlNode::free(double* arr)
+{
+	if (arr != NULL)
+		delete [] arr;
+}
+
+void xmlNode::free(float* arr)
 {
 	if (arr != NULL)
 		delete [] arr;
@@ -356,7 +368,7 @@ char* xmlElement::parse(char* buffer, bool* status)
 
 	_name[length] = '\0';
 
-	printf("element tag: %s\n", _name);
+	// printf("element tag: %s\n", _name);
 
 	buffer = skipSpace(buffer);
 
@@ -781,7 +793,7 @@ char* xmlText::parse(char* buffer, bool* status)
 
 	_value[length] = '\0';
 
-	printf("text: %s\n", _value);
+	// printf("text: %s\n", _value);
 
 	return buffer;
 }
@@ -823,7 +835,7 @@ char* xmlAttribute::parse(char* buffer, bool* status)
 				if (_name[i] == ' ' || _name[i] == '\t')
 					_name[i] = '\0';
 			}
-			printf("attribute name: %s\n", _name);
+			// printf("attribute name: %s\n", _name);
 		}
 
 		// printf("buffer = %c\n", *buffer);
@@ -839,7 +851,7 @@ char* xmlAttribute::parse(char* buffer, bool* status)
 			_value = new char [length];
 			strncpy(_value, start, length-1);
 			_value[length-1] = '\0';
-			printf("attribute value: %s\n", _value);
+			// printf("attribute value: %s\n", _value);
 			buffer++;
 			break;
 		}
@@ -883,7 +895,7 @@ char* xmlComment::parse(char* buffer, bool* status)
 	strncpy(_value, start, length);
 	_value[length] = '\0';
 
-	printf("comment: %s\n", _value);
+	// printf("comment: %s\n", _value);
 
 	buffer = buffer + 3;
 	return buffer;
@@ -923,7 +935,7 @@ char* xmlDeclaration::parse(char* buffer, bool* status)
 
 	strncpy(_value, start, length);
 	_value[length] = '\0';
-	printf("declaration: %s\n", _value);
+	// printf("declaration: %s\n", _value);
 	buffer = buffer + 2;
 	return buffer;
 }
@@ -962,9 +974,9 @@ void xmlDocument::loadXMLDocument(const char* xmldoc)
 	fclose(fin);
 
 	// 删除换行符和TAB
-	printf("length: %ld buffer size %lu ", length, strlen(_buffer));
+	// printf("length: %ld buffer size %lu ", length, strlen(_buffer));
 
-	printf("xml file:\n%s\n", _buffer);
+	// printf("xml file:\n%s\n", _buffer);
 
 	char* buffer = new char [length+1];
 
@@ -988,12 +1000,12 @@ void xmlDocument::loadXMLDocument(const char* xmldoc)
 	delete [] old_buffer;
 	_buffer = NULL;
 	_buffer = buffer;
-	printf("--------------------------------------\n%s\n", _buffer);
+	// printf("--------------------------------------\n%s\n", _buffer);
 
 	// 解析xml
 	bool status = true;
 	xmlNode::parse(buffer, &status);
 
-	printf("=================================");
-	print();
+	// printf("=================================");
+	// print();
 }
