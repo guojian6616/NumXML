@@ -1006,6 +1006,6 @@ void xmlDocument::loadXMLDocument(const char* xmldoc)
 	bool status = true;
 	xmlNode::parse(buffer, &status);
 
-	// printf("=================================");
-	// print();
+	printf("=================================");
+	print();
 }

@@ -1,29 +1,23 @@
-     <?xml version="1.0"?>
-<!-- materials cross-section for KUCA benchmark -->
-<materials>
-   	<material name="kuca_core" id = "1001" energy_group="2 3 4 1 1">
-		<sigma_t>2.0 4.0</sigma_t>
-		<nu_sigma_f>1.0 1.0</nu_sigma_f>
-		<sigma_s>1.0 1.0 1.0 1.0</sigma_s>
-	</material>
-	<material name="kuca_reflector" id="1002" energy_group="2">
-		<sigma_t>1.0 1.0</sigma_t>
-		<nu_sigma_f>1.0 1.0</nu_sigma_f>
-		<sigma_s>1.0 1.0 1.0 1.0</sigma_s>
-	</material>
-	<material name="kuca_cr" id="1003" energy_group="2">
-		<sigma_t>1.0 1.0</sigma_t>
-		<nu_sigma_f>1.0 1.0</nu_sigma_f>
-		<sigma_s>1.0 1.0 1.0 1.0</sigma_s>
-	</material>
-	<material name="kuca_crp" id="1004" energy_group="2">
-		<sigma_t>1.0 1.0</sigma_t>
-		<nu_sigma_f>1.0 1.0</nu_sigma_f>
-		<sigma_s>1.0 1.0 1.0 1.0</sigma_s>
-	</material>
-
-	<material name="kuca_core" id="1005" energy_group="2"
-		sigma_t =    "1.0 1.0"
-		nu_sigma_f = "1.0 1.0"
-		sigma_s =    "1.0 1.0 1.0 1.0" />
-</materials>
+<?xml version="1.0" ?>
+<mocp>
+	<configuration>
+		<tracer spacing="1.0" quadrature="carlson|lee|gauss_legendre|equal_weight_polar|equal_angle_polar" order="4" polar="2" azimuthal="6" />
+		<solver type="eigenvalue" criterion="scalar_flux|fission_source|total_source" max_iter="1500" keff="1.0" tolerance="1.e-5" />
+		<parallelism threads="1" />
+	</configuration>
+	<materials>
+		<material name="core" id="101" energy_groups="2">
+			<sigma_t>1.0 1.0</sigma_t>
+			<nu_sigma_f>2.0 2.0</nu_sigma_f>
+			<sigma_s>3.0 3.0 3.0 3.0</sigma_s>
+			<chi>0.5 0.5</chi>
+		</material>
+	</materials>
+	<sufaces>
+		<surface name="top" id="1001" bc="none" type="xplane|yplane|zplane|zcylinder|sphere|zcone" paras="124.7|124.7|124.7|0. 0. 5.|0. 0. 0. 5.|" />
+	</sufaces>
+	<cells>
+		<root name="root" id="10001" type="container|material" filler="1001" mesh="2" isometric="yes|no" sectors="4" octant="yes" paras="122 212" />
+		<cell name="top" id="10002" type="container|material" filler="1002" mesh="2" isometric="yes|no" sectors="4" octant="yes" paras="122 212" />
+	</cells>
+</mocp>

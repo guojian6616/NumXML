@@ -1,48 +1,53 @@
 #include "NumXML.h"
 
-int main()
+int main(int argc, char* argv[])
 {
 	xmlDocument* xmldoc = new xmlDocument();
-	xmldoc->loadXMLDocument("template.xml");
-
-	int number = xmldoc->getNumberElement("material");
-	printf("number material = %d\n", number);
+	xmldoc->loadXMLDocument(argv[1]);
+	// delete xmldoc;
 
 
+	// xmlDocument* xmldoc = new xmlDocument();
+	// xmldoc->loadXMLDocument("template.xml");
 
-	xmlElement** material = new xmlElement* [number];
+	// int number = xmldoc->getNumberElement("material");
+	// printf("number material = %d\n", number);
 
-	xmldoc->getElementsNamedAfter("material", material);
 
 
-	printf("=========================================\n");
-	for(int i=0; i<number; i++)
-	{
-		material[i]->print();
-	}
+	// xmlElement** material = new xmlElement* [number];
 
-	printf("=========================================\n");
-	printf("material id=%d\n", material[0]->getAttributeValueInteger("id"));
-	printf("material name=%s\n", material[0]->getAttributeValue("name"));
-	printf("material id=%s\n", material[0]->getAttributeValue("id"));
-	printf("material name=%s sigma_t=%s\n", material[0]->getAttributeValue("name"), material[0]->getElementValue("sigma_t"));
+	// xmldoc->getElementsNamedAfter("material", material);
 
-	// int number = 0;
-	double* sigma_t = material[0]->getElementValueDoubles("sigma_t", &number);
-	printf("number = %d\n", number);
 
-	for (int i=0; i<number; i++)
-		printf("sigma_t[%d] = %f\n", i, sigma_t[i]);
+	// printf("=========================================\n");
+	// for(int i=0; i<number; i++)
+	// {
+	// 	material[i]->print();
+	// }
 
-	xmldoc->free(sigma_t);
-	// delete [] sigma_t;
+	// printf("=========================================\n");
+	// printf("material id=%d\n", material[0]->getAttributeValueInteger("id"));
+	// printf("material name=%s\n", material[0]->getAttributeValue("name"));
+	// printf("material id=%s\n", material[0]->getAttributeValue("id"));
+	// printf("material name=%s sigma_t=%s\n", material[0]->getAttributeValue("name"), material[0]->getElementValue("sigma_t"));
 
-	int* g = material[0]->getAttributeValueIntegers("energy_group", &number);
-	// printf("g = %f\n", g);
-	printf("number = %d\n", number);
-	for (int i=0; i<number; i++)
-		printf("g[%d] = %d\n", i, g[i]);
-	delete [] material;
+	// // int number = 0;
+	// double* sigma_t = material[0]->getElementValueDoubles("sigma_t", &number);
+	// printf("number = %d\n", number);
+
+	// for (int i=0; i<number; i++)
+	// 	printf("sigma_t[%d] = %f\n", i, sigma_t[i]);
+
+	// xmldoc->free(sigma_t);
+	// // delete [] sigma_t;
+
+	// int* g = material[0]->getAttributeValueIntegers("energy_group", &number);
+	// // printf("g = %f\n", g);
+	// printf("number = %d\n", number);
+	// for (int i=0; i<number; i++)
+	// 	printf("g[%d] = %d\n", i, g[i]);
+	// delete [] material;
 
 	delete xmldoc;
 	return 0;

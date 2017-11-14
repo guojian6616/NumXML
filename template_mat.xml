@@ -1,0 +1,29 @@
+     <?xml version="1.0"?>
+<!-- materials cross-section for KUCA benchmark -->
+<materials>
+   	<material name="kuca_core" id = "1001" energy_group="2 3 4 1 1">
+		<sigma_t>2.0 4.0</sigma_t>
+		<nu_sigma_f>1.0 1.0</nu_sigma_f>
+		<sigma_s>1.0 1.0 1.0 1.0</sigma_s>
+	</material>
+	<material name="kuca_reflector" id="1002" energy_group="2">
+		<sigma_t>1.0 1.0</sigma_t>
+		<nu_sigma_f>1.0 1.0</nu_sigma_f>
+		<sigma_s>1.0 1.0 1.0 1.0</sigma_s>
+	</material>
+	<material name="kuca_cr" id="1003" energy_group="2">
+		<sigma_t>1.0 1.0</sigma_t>
+		<nu_sigma_f>1.0 1.0</nu_sigma_f>
+		<sigma_s>1.0 1.0 1.0 1.0</sigma_s>
+	</material>
+	<material name="kuca_crp" id="1004" energy_group="2">
+		<sigma_t>1.0 1.0</sigma_t>
+		<nu_sigma_f>1.0 1.0</nu_sigma_f>
+		<sigma_s>1.0 1.0 1.0 1.0</sigma_s>
+	</material>
+
+	<material name="kuca_core" id="1005" energy_group="2"
+		sigma_t =    "1.0 1.0"
+		nu_sigma_f = "1.0 1.0"
+		sigma_s =    "1.0 1.0 1.0 1.0" />
+</materials>
