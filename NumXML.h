@@ -134,6 +134,8 @@ public:
 
 	char* parse(char* buffer, bool* status=NULL);
 
+	int getNumberChildren();
+
 	void print();
 };
 

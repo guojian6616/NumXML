@@ -398,6 +398,19 @@ char* xmlElement::parse(char* buffer, bool* status)
 	return buffer;
 }
 
+int xmlElement::getNumberChildren()
+{
+	int number = 0;
+
+	xmlNode* node = _first_child;
+	while (node != NULL)
+	{
+		number++;
+		node = node->getNext();
+	}
+	return number;
+}
+
 
 void xmlElement::setAttributeNode(xmlAttribute* attr)
 {
@@ -501,15 +514,15 @@ char* xmlElement::getElementValue(const char* name)
 		printf("ELement: %s, child element name is null\n", _name);
 		return NULL;
 	}
+	// printf("_first_child addr: %p\n", &_first_child);
 
 	xmlNode* node = _first_child;
 	while (node != NULL)
 	{
 		if (node->getType() == XML_ELEMENT_NODE && static_cast<xmlElement*>(node)->isNameAfter(name))
-		{
 			return static_cast<xmlElement*>(node)->getElementValue();
-			node = node->getNext();
-		}
+		node = node->getNext();
+		// printf("---n");
 	}
 
 	printf("Element: %s has no child element named after %s\n", _name, name);
@@ -663,6 +676,7 @@ double* xmlElement::getElementValueDoubles(const char* name, int* number)
 		*number = 0;
 		return NULL;
 	}
+	// printf("value=(%s)\n", value);
 	*number = getNumberFigures(value);
 	double * figures = new double [*number];
 	char* endptr = value;
